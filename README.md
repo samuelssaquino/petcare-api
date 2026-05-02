@@ -71,6 +71,12 @@ Iniciar a API em modo desenvolvimento, reiniciando ao alterar arquivos:
 npm run dev
 ```
 
+Rodar testes unitarios:
+
+```bash
+npm test
+```
+
 ## Documentacao
 
 Com a API em execucao, acesse:
