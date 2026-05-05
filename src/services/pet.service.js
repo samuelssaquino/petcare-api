@@ -31,6 +31,29 @@ function validatePetData({ name, age, weight }) {
   validateNonNegativeNumber(weight, 'weight');
 }
 
+function addDefinedField(target, source, fieldName) {
+  if (source[fieldName] !== undefined) {
+    target[fieldName] = source[fieldName];
+  }
+}
+
+function toPublicPet(pet) {
+  const petData = typeof pet.toObject === 'function' ? pet.toObject({ virtuals: true }) : pet;
+  const publicPet = {};
+
+  addDefinedField(publicPet, petData, 'id');
+  addDefinedField(publicPet, petData, 'name');
+  addDefinedField(publicPet, petData, 'species');
+  addDefinedField(publicPet, petData, 'breed');
+  addDefinedField(publicPet, petData, 'age');
+  addDefinedField(publicPet, petData, 'weight');
+  addDefinedField(publicPet, petData, 'notes');
+  addDefinedField(publicPet, petData, 'createdAt');
+  addDefinedField(publicPet, petData, 'updatedAt');
+
+  return publicPet;
+}
+
 async function createPet(ownerId, petData) {
   const normalizedPetData = normalizePetData(petData);
 
@@ -43,7 +66,9 @@ async function createPet(ownerId, petData) {
 }
 
 async function listPets(ownerId) {
-  return Pet.find({ owner: ownerId }).sort({ createdAt: -1 });
+  const pets = await Pet.find({ owner: ownerId }).sort({ createdAt: -1 });
+
+  return pets.map(toPublicPet);
 }
 
 module.exports = {

@@ -69,6 +69,10 @@ paths:
       responses:
         '200':
           description: Lista de PETs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPetsResponse'
         '401':
           description: Token ausente ou invalido
 components:
@@ -135,3 +139,42 @@ components:
         notes:
           type: string
           example: Friendly and playful.
+    PublicPet:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6636b70158c7a946d60ca100
+        name:
+          type: string
+          example: Thor
+        species:
+          type: string
+          example: Dog
+        breed:
+          type: string
+          example: Golden Retriever
+        age:
+          type: number
+          example: 3
+        weight:
+          type: number
+          example: 28.5
+        notes:
+          type: string
+          example: Friendly and playful.
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ListPetsResponse:
+      type: object
+      required:
+        - pets
+      properties:
+        pets:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicPet'
