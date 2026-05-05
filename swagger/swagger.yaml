@@ -95,6 +95,8 @@ components:
         password:
           type: string
           format: password
+          minLength: 8
+          pattern: '^(?=.*[A-Za-z])(?=.*\d).{8,}$'
           example: StrongPassword123
     LoginRequest:
       type: object
