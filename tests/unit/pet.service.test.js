@@ -116,7 +116,13 @@ test('lists pets associated with the owner ordered by creation date', async () =
     return {
       sort: async (sort) => {
         sortQuery = sort;
-        return [{ id: 'pet-id', name: 'Thor', owner: 'user-id' }];
+        return [{
+          id: 'pet-id',
+          name: 'Thor',
+          species: 'Dog',
+          owner: 'user-id',
+          __v: 0
+        }];
       }
     };
   };
@@ -125,5 +131,15 @@ test('lists pets associated with the owner ordered by creation date', async () =
 
   assert.deepEqual(findQuery, { owner: 'user-id' });
   assert.deepEqual(sortQuery, { createdAt: -1 });
-  assert.deepEqual(result, [{ id: 'pet-id', name: 'Thor', owner: 'user-id' }]);
+  assert.deepEqual(result, [{ id: 'pet-id', name: 'Thor', species: 'Dog' }]);
+});
+
+test('returns an empty list when owner has no pets', async () => {
+  Pet.find = () => ({
+    sort: async () => []
+  });
+
+  const result = await petService.listPets('user-id');
+
+  assert.deepEqual(result, []);
 });
