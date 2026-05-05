@@ -4,10 +4,33 @@ const env = require('../config/env');
 const User = require('../models/user.model');
 const { UnauthorizedError, ValidationError } = require('../utils/errors');
 
-async function login({ email, password }) {
-  if (!email || !password) {
-    throw new ValidationError('Email and password are required.');
+function normalizeCredentials(credentials = {}) {
+  return {
+    email: typeof credentials.email === 'string' ? credentials.email.trim().toLowerCase() : credentials.email,
+    password: credentials.password
+  };
+}
+
+function validateRequiredFields({ email, password }) {
+  const missingFields = [];
+
+  if (!email) {
+    missingFields.push('email');
   }
+
+  if (!password) {
+    missingFields.push('password');
+  }
+
+  if (missingFields.length > 0) {
+    throw new ValidationError(`Missing required fields: ${missingFields.join(', ')}.`);
+  }
+}
+
+async function login(credentials) {
+  const { email, password } = normalizeCredentials(credentials);
+
+  validateRequiredFields({ email, password });
 
   const user = await User.findOne({ email }).select('+password');
 
