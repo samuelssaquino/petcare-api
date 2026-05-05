@@ -1,13 +1,43 @@
 const Pet = require('../models/pet.model');
 const { ValidationError } = require('../utils/errors');
 
-async function createPet(ownerId, petData) {
-  if (!petData.name) {
+function trimString(value) {
+  return typeof value === 'string' ? value.trim() : value;
+}
+
+function normalizePetData(petData = {}) {
+  return {
+    name: trimString(petData.name),
+    species: trimString(petData.species),
+    breed: trimString(petData.breed),
+    age: petData.age,
+    weight: petData.weight,
+    notes: trimString(petData.notes)
+  };
+}
+
+function validateNonNegativeNumber(value, fieldName) {
+  if (value !== undefined && (typeof value !== 'number' || value < 0)) {
+    throw new ValidationError(`Pet ${fieldName} must be a non-negative number.`);
+  }
+}
+
+function validatePetData({ name, age, weight }) {
+  if (!name) {
     throw new ValidationError('Pet name is required.');
   }
 
+  validateNonNegativeNumber(age, 'age');
+  validateNonNegativeNumber(weight, 'weight');
+}
+
+async function createPet(ownerId, petData) {
+  const normalizedPetData = normalizePetData(petData);
+
+  validatePetData(normalizedPetData);
+
   return Pet.create({
-    ...petData,
+    ...normalizedPetData,
     owner: ownerId
   });
 }
