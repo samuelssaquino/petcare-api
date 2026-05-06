@@ -85,6 +85,23 @@ Com a API em execucao, acesse:
 http://localhost:3000/api-docs
 ```
 
+## Deploy na Vercel
+
+Variaveis necessarias no projeto da Vercel:
+
+```text
+MONGODB_URI=
+JWT_SECRET=
+JWT_EXPIRES_IN=1d
+BASE_URL=https://petcare-api-seven.vercel.app
+```
+
+Use uma `MONGODB_URI` do MongoDB Atlas para o deploy online. Para testar no Postman, use a base URL da Vercel e os mesmos endpoints da API, por exemplo:
+
+```text
+POST https://petcare-api-seven.vercel.app/api/users
+```
+
 ## Endpoints iniciais
 
 - `GET /health`
