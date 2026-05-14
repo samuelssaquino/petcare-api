@@ -1,0 +1,46 @@
+name: API Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    container:
+      image: node:20-bookworm
+
+    services:
+      mongo:
+        image: mongo:7
+
+    env:
+      PORT: 3000
+      BASE_URL: http://localhost:3000
+      MONGODB_URI: mongodb://mongo:27017/petcare-api-ci
+      JWT_SECRET: ci-secret
+      JWT_EXPIRES_IN: 1d
+      NODE_ENV: test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Start API
+        run: npm start &
+
+      - name: Wait for API healthcheck
+        run: npx wait-on http://localhost:3000/health --timeout 60000
+
+      - name: Run API tests
+        run: npm run test:api

@@ -5,9 +5,11 @@ const petService = require('../../src/services/pet.service');
 const petController = require('../../src/controllers/pet.controller');
 
 const originalListPets = petService.listPets;
+const originalGetPetById = petService.getPetById;
 
 function restoreMocks() {
   petService.listPets = originalListPets;
+  petService.getPetById = originalGetPetById;
 }
 
 function createResponse() {
@@ -80,5 +82,41 @@ test('responds with an empty list when authenticated user has no pets', async ()
   assert.equal(res.statusCode, 200);
   assert.deepEqual(res.body, {
     pets: []
+  });
+});
+
+test('responds with status 200 and requested authenticated user pet', async () => {
+  const req = {
+    params: {
+      petId: '6636b70158c7a946d60ca100'
+    },
+    user: {
+      id: 'user-id'
+    }
+  };
+  const res = createResponse();
+  let requestedOwnerId;
+  let requestedPetId;
+
+  petService.getPetById = async (ownerId, petId) => {
+    requestedOwnerId = ownerId;
+    requestedPetId = petId;
+
+    return {
+      id: 'pet-id',
+      name: 'Thor',
+      species: 'Dog'
+    };
+  };
+
+  await petController.getPetById(req, res, () => {});
+
+  assert.equal(requestedOwnerId, 'user-id');
+  assert.equal(requestedPetId, '6636b70158c7a946d60ca100');
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(res.body, {
+    id: 'pet-id',
+    name: 'Thor',
+    species: 'Dog'
   });
 });

@@ -6,10 +6,12 @@ const petService = require('../../src/services/pet.service');
 
 const originalCreate = Pet.create;
 const originalFind = Pet.find;
+const originalFindOne = Pet.findOne;
 
 function restoreMocks() {
   Pet.create = originalCreate;
   Pet.find = originalFind;
+  Pet.findOne = originalFindOne;
 }
 
 test.afterEach(() => {
@@ -142,4 +144,50 @@ test('returns an empty list when owner has no pets', async () => {
   const result = await petService.listPets('user-id');
 
   assert.deepEqual(result, []);
+});
+
+test('gets a pet by id associated with the owner', async () => {
+  const petId = '6636b70158c7a946d60ca100';
+  let findOneQuery;
+
+  Pet.findOne = async (query) => {
+    findOneQuery = query;
+
+    return {
+      id: 'pet-id',
+      name: 'Thor',
+      species: 'Dog',
+      owner: 'user-id',
+      __v: 0
+    };
+  };
+
+  const result = await petService.getPetById('user-id', petId);
+
+  assert.deepEqual(findOneQuery, { _id: petId, owner: 'user-id' });
+  assert.deepEqual(result, { id: 'pet-id', name: 'Thor', species: 'Dog' });
+});
+
+test('rejects pet lookup when pet does not exist for owner', async () => {
+  Pet.findOne = async () => null;
+
+  await assert.rejects(
+    () => petService.getPetById('user-id', '6636b70158c7a946d60ca100'),
+    (error) => {
+      assert.equal(error.statusCode, 404);
+      assert.equal(error.message, 'Pet not found.');
+      return true;
+    }
+  );
+});
+
+test('rejects pet lookup with invalid id', async () => {
+  await assert.rejects(
+    () => petService.getPetById('user-id', 'invalid-id'),
+    (error) => {
+      assert.equal(error.statusCode, 400);
+      assert.equal(error.message, 'Invalid pet id.');
+      return true;
+    }
+  );
 });

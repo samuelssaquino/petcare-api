@@ -1,5 +1,7 @@
+const mongoose = require('mongoose');
+
 const Pet = require('../models/pet.model');
-const { ValidationError } = require('../utils/errors');
+const { NotFoundError, ValidationError } = require('../utils/errors');
 
 function trimString(value) {
   return typeof value === 'string' ? value.trim() : value;
@@ -29,6 +31,12 @@ function validatePetData({ name, age, weight }) {
 
   validateNonNegativeNumber(age, 'age');
   validateNonNegativeNumber(weight, 'weight');
+}
+
+function validatePetId(petId) {
+  if (!mongoose.isValidObjectId(petId)) {
+    throw new ValidationError('Invalid pet id.');
+  }
 }
 
 function addDefinedField(target, source, fieldName) {
@@ -71,8 +79,21 @@ async function listPets(ownerId) {
   return pets.map(toPublicPet);
 }
 
+async function getPetById(ownerId, petId) {
+  validatePetId(petId);
+
+  const pet = await Pet.findOne({ _id: petId, owner: ownerId });
+
+  if (!pet) {
+    throw new NotFoundError('Pet not found.');
+  }
+
+  return toPublicPet(pet);
+}
+
 module.exports = {
   createPet,
+  getPetById,
   listPets
 };
 
