@@ -75,6 +75,31 @@ paths:
                 $ref: '#/components/schemas/ListPetsResponse'
         '401':
           description: Token ausente ou invalido
+  /api/pets/{petId}:
+    get:
+      summary: Apresenta um PET do usuario autenticado
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: petId
+          required: true
+          schema:
+            type: string
+          description: ID do PET
+      responses:
+        '200':
+          description: PET encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicPet'
+        '400':
+          description: ID do PET invalido
+        '401':
+          description: Token ausente ou invalido
+        '404':
+          description: PET nao encontrado
 components:
   securitySchemes:
     bearerAuth:

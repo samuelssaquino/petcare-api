@@ -18,8 +18,18 @@ async function listPets(req, res, next) {
   }
 }
 
+async function getPetById(req, res, next) {
+  try {
+    const pet = await petService.getPetById(req.user.id, req.params.petId);
+    res.status(200).json(pet);
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   createPet,
+  getPetById,
   listPets
 };
 

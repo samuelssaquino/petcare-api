@@ -6,6 +6,7 @@ const router = Router();
 
 router.post('/pets', authMiddleware, petController.createPet);
 router.get('/pets', authMiddleware, petController.listPets);
+router.get('/pets/:petId', authMiddleware, petController.getPetById);
 
 module.exports = router;
 

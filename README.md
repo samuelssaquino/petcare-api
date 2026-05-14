@@ -77,6 +77,12 @@ Rodar testes unitarios:
 npm test
 ```
 
+Rodar testes automatizados de API:
+
+```bash
+npm run test:api:local
+```
+
 ## Documentacao
 
 Com a API em execucao, acesse:
@@ -102,6 +108,10 @@ Use uma `MONGODB_URI` do MongoDB Atlas para o deploy online. Para testar no Post
 POST https://petcare-api-seven.vercel.app/api/users
 ```
 
+## CI
+
+A CI do GitHub Actions roda em pull requests para a branch `main` e tambem pode ser executada manualmente. O workflow sobe um MongoDB temporario via service container, inicia a API em background, aguarda `/health` ficar disponivel e executa os testes automatizados de API.
+
 ## Endpoints iniciais
 
 - `GET /health`
@@ -109,4 +119,5 @@ POST https://petcare-api-seven.vercel.app/api/users
 - `POST /api/login`
 - `POST /api/pets`
 - `GET /api/pets`
+- `GET /api/pets/:petId`
 

@@ -6,7 +6,11 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "test:unit": "node --test",
+    "test:api": "mocha \"tests/api/**/*.spec.js\" --timeout 15000",
+    "test:api:local": "set BASE_URL=http://localhost:3000&& npm run test:api",
+    "test:api:vercel": "set BASE_URL=https://petcare-api-seven.vercel.app&& npm run test:api"
   },
   "keywords": [
     "api",
@@ -28,7 +32,10 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "chai": "^6.2.2",
+    "mocha": "^11.7.5",
+    "nodemon": "^3.1.9",
+    "supertest": "^7.2.2",
+    "wait-on": "^9.0.10"
   }
 }
-
